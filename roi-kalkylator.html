@@ -422,6 +422,80 @@
       color: var(--color-error);
     }
 
+    /* Net Result Highlight */
+    .result-row.net-highlight {
+      background: var(--color-background);
+      margin: var(--spacing-md) calc(var(--spacing-md) * -1);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+    }
+
+    .result-row.net-highlight .result-label {
+      font-size: 16px;
+      color: var(--color-text-primary);
+    }
+
+    .result-row.net-highlight .result-value {
+      font-size: 22px;
+    }
+
+    /* ROI Plus/Minus Indicator */
+    .visual-indicator-container {
+      margin-top: var(--spacing-xl);
+      padding-top: var(--spacing-lg);
+      border-top: 1px solid var(--color-border);
+      text-align: center;
+    }
+
+    .indicator-label {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-md);
+      display: block;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .indicator-track {
+      height: 12px;
+      background: var(--color-border);
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .indicator-bar {
+      height: 100%;
+      width: 0%;
+      position: absolute;
+      left: 50%;
+      transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease;
+    }
+
+    .indicator-bar.positive {
+      background: var(--color-success);
+      border-radius: 0 6px 6px 0;
+    }
+
+    .indicator-bar.negative {
+      background: var(--color-error);
+      border-radius: 6px 0 0 6px;
+    }
+
+    .indicator-center {
+      position: absolute;
+      left: 50%;
+      top: -2px;
+      bottom: -2px;
+      width: 2px;
+      background: var(--color-text-primary);
+      z-index: 2;
+      transform: translateX(-50%);
+    }
+
     /* Additional Results */
     .additional-results {
       margin-top: var(--spacing-lg);
@@ -678,7 +752,7 @@
 
     <div class="calculator-layout">
       <!-- Left Column: Inputs -->
-      <div class="card">
+      <div class="card" style="padding-top: 32px;">
         <!-- Slider: Antal Leads -->
         <div class="slider-group">
           <div class="slider-header">
@@ -748,8 +822,7 @@
             <span>50000</span>
           </div>
         </div>
-
-        <!-- Dark Mode Toggle -->
+        <!-- Dark Mode & Currency Selector -->
         <div class="theme-toggle-wrapper">
           <span class="theme-toggle-label">Dark Mode</span>
           <label class="theme-toggle">
@@ -757,12 +830,9 @@
             <span class="toggle-slider"></span>
           </label>
         </div>
-      </div>
 
-      <!-- Right Column: Results -->
-      <div class="card results-section" id="results">
-        <div class="card-header">
-          <h2 class="card-title">Ditt resultat</h2>
+        <div class="theme-toggle-wrapper" style="border-top: none; padding-top: var(--spacing-sm); margin-top: 0;">
+          <span class="theme-toggle-label">Valuta</span>
           <div class="currency-selector" role="radiogroup" aria-label="Välj valuta">
             <button type="button" class="currency-btn active" data-currency="SEK" role="radio"
               aria-checked="true">SEK</button>
@@ -772,12 +842,16 @@
               aria-checked="false">EUR</button>
           </div>
         </div>
+      </div>
+
+      <!-- Right Column: Results -->
+      <div class="card results-section" id="results" style="padding-top: 32px;">
 
         <!-- Summary Table -->
         <table class="summary-table">
           <thead>
             <tr>
-              <th>Namn</th>
+              <th>Resultat</th>
               <th>Totalt</th>
             </tr>
           </thead>
@@ -816,14 +890,23 @@
             <span class="value" id="result-adspend">10,000 SEK</span>
           </div>
           <div class="additional-result">
-            <span class="label">Nettointäkt</span>
-            <span class="value" id="result-net">10,000 SEK</span>
-          </div>
-          <div class="additional-result">
             <span class="label">Kostnad per lead</span>
             <span class="value" id="result-cpl">20 SEK</span>
           </div>
 
+          <div class="result-row highlight net-highlight">
+            <span class="result-label">Nettointäkt</span>
+            <span class="result-value" id="result-net">10,000 SEK</span>
+          </div>
+        </div>
+
+        <!-- Visual Indicator -->
+        <div class="visual-indicator-container">
+          <span class="indicator-label">Resultat</span>
+          <div class="indicator-track">
+            <div class="indicator-center"></div>
+            <div id="visual-bar" class="indicator-bar"></div>
+          </div>
         </div>
 
 
@@ -991,10 +1074,33 @@
 
         // Update net color
         elements.results.net.classList.remove('positive', 'negative');
+        const visualBar = document.getElementById('visual-bar');
+
         if (results.netRevenue > 0) {
           elements.results.net.classList.add('positive');
+          if (visualBar) {
+            visualBar.className = 'indicator-bar positive';
+            // Calculate percentage of max adspend or some reasonable range for visualization
+            // Let's use 100% of revenue as a scale for now, capped at 50% width from center
+            const maxRange = Math.max(results.revenue, state.adSpend * 2, 10000);
+            const percentage = Math.min((results.netRevenue / maxRange) * 50, 50);
+            visualBar.style.left = '50%';
+            visualBar.style.width = percentage + '%';
+          }
         } else if (results.netRevenue < 0) {
           elements.results.net.classList.add('negative');
+          if (visualBar) {
+            visualBar.className = 'indicator-bar negative';
+            const maxRange = Math.max(state.adSpend, 10000);
+            const percentage = Math.min((Math.abs(results.netRevenue) / maxRange) * 50, 50);
+            visualBar.style.left = (50 - percentage) + '%';
+            visualBar.style.width = percentage + '%';
+          }
+        } else {
+          if (visualBar) {
+            visualBar.style.width = '0%';
+            visualBar.style.left = '50%';
+          }
         }
 
 
