@@ -682,7 +682,7 @@
         <!-- Slider: Antal Leads -->
         <div class="slider-group">
           <div class="slider-header">
-            <label class="slider-label" for="leads">Antal Leads</label>
+            <label class="slider-label" for="leads">Antal leads</label>
             <span class="slider-value" id="leads-value">500</span>
           </div>
           <div class="slider-wrapper">
@@ -694,7 +694,7 @@
             <span>100</span>
             <span>8000</span>
           </div>
-          <p class="slider-help" id="leads-help">Antalet personer som ser ditt erbjudande</p>
+          <p class="slider-help" id="leads-help">Antalet personer som ser din digitala produkt</p>
         </div>
 
         <!-- Slider: Konvertering -->
@@ -718,7 +718,7 @@
         <!-- Slider: Pris -->
         <div class="slider-group">
           <div class="slider-header">
-            <label class="slider-label" for="product-price">Pris på din onlinekurs</label>
+            <label class="slider-label" for="product-price">Pris på din digitala produkt</label>
             <span class="slider-value" id="price-value">2,000</span>
           </div>
           <div class="slider-wrapper">
@@ -735,7 +735,7 @@
         <!-- Slider: Annonskostnad -->
         <div class="slider-group">
           <div class="slider-header">
-            <label class="slider-label" for="ad-spend">Annonskostnad per månad</label>
+            <label class="slider-label" for="ad-spend">Annonskostnad</label>
             <span class="slider-value" id="adspend-value">10,000</span>
           </div>
           <div class="slider-wrapper">
@@ -762,7 +762,7 @@
       <!-- Right Column: Results -->
       <div class="card results-section" id="results">
         <div class="card-header">
-          <h2 class="card-title">Din intäkt</h2>
+          <h2 class="card-title">Ditt resultat</h2>
           <div class="currency-selector" role="radiogroup" aria-label="Välj valuta">
             <button type="button" class="currency-btn active" data-currency="SEK" role="radio"
               aria-checked="true">SEK</button>
@@ -783,15 +783,15 @@
           </thead>
           <tbody>
             <tr>
-              <td>Antal Leads</td>
+              <td>Antal leads</td>
               <td id="summary-leads">500</td>
             </tr>
             <tr>
-              <td>Konvertering I Procent (%)</td>
+              <td>Konvertering i procent (%)</td>
               <td id="summary-conversion">2</td>
             </tr>
             <tr>
-              <td>Pris På Din Onlinekurs</td>
+              <td>Pris på din digitala produkt</td>
               <td id="summary-price">2,000 SEK</td>
             </tr>
           </tbody>
@@ -823,22 +823,10 @@
             <span class="label">Kostnad per lead</span>
             <span class="value" id="result-cpl">20 SEK</span>
           </div>
-          <div class="additional-result">
-            <span class="label">Kostnad per kund (CAC)</span>
-            <span class="value" id="result-cac">1,000 SEK</span>
-          </div>
+
         </div>
 
-        <!-- ROI Indicator -->
-        <div class="roi-indicator">
-          <div class="roi-header">
-            <span class="roi-label">Avkastning (ROI)</span>
-            <span class="roi-value positive" id="result-roi">100.0%</span>
-          </div>
-          <div class="roi-bar" role="progressbar" aria-valuemin="0" aria-valuemax="200" aria-valuenow="100">
-            <div class="roi-bar-fill positive" id="roi-bar-fill" style="width: 50%;"></div>
-          </div>
-        </div>
+
       </div>
     </div>
   </div>
@@ -914,10 +902,7 @@
           customers: document.getElementById('result-customers'),
           adspend: document.getElementById('result-adspend'),
           net: document.getElementById('result-net'),
-          cpl: document.getElementById('result-cpl'),
-          cac: document.getElementById('result-cac'),
-          roi: document.getElementById('result-roi'),
-          roiBarFill: document.getElementById('roi-bar-fill')
+          cpl: document.getElementById('result-cpl')
         },
         currencyButtons: document.querySelectorAll('.currency-btn'),
         themeToggle: document.getElementById('theme-toggle')
@@ -1003,7 +988,6 @@
         elements.results.adspend.textContent = formatCurrency(results.adSpend);
         elements.results.net.textContent = formatCurrency(results.netRevenue);
         elements.results.cpl.textContent = formatCurrency(results.costPerLead, 0);
-        elements.results.cac.textContent = formatCurrency(results.cac, 0);
 
         // Update net color
         elements.results.net.classList.remove('positive', 'negative');
@@ -1013,22 +997,7 @@
           elements.results.net.classList.add('negative');
         }
 
-        // Update ROI
-        const roiFormatted = formatNumber(results.roi, 1) + '%';
-        elements.results.roi.textContent = roiFormatted;
-        elements.results.roi.classList.remove('positive', 'negative');
 
-        if (results.roi > 0) {
-          elements.results.roi.classList.add('positive');
-        } else if (results.roi < 0) {
-          elements.results.roi.classList.add('negative');
-        }
-
-        // Update ROI bar
-        const roiBarPercentage = Math.min(Math.abs(results.roi) / 2, 100);
-        elements.results.roiBarFill.style.width = roiBarPercentage + '%';
-        elements.results.roiBarFill.classList.remove('positive', 'negative');
-        elements.results.roiBarFill.classList.add(results.roi >= 0 ? 'positive' : 'negative');
       }
 
       // ============================================
